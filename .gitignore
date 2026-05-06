@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Environments
+.env
+.venv/
+venv/
+
+# Build artifacts
+*.tar.gz
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
