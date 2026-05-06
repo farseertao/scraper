@@ -1,0 +1,115 @@
+sources:
+  - key: zju_itt
+    name: 浙江大学成果页
+    entry_urls:
+      - http://www.itt.zju.edu.cn/70618/list.htm
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+
+  - key: zjut_news
+    name: 浙江工业大学新闻成果入口
+    entry_urls:
+      - http://www.news.zjut.edu.cn/5422/list.htm
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+    http_timeout_seconds: 15
+
+  - key: hdu_research
+    name: 杭州电子科技大学科研成果页
+    entry_urls:
+      - https://research.hdu.edu.cn/main.htm
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+    http_timeout_seconds: 20
+
+  - key: zj_search_recent
+    name: 浙江省搜索补充发现
+    entry_urls:
+      - https://api.bochaai.com/v1/web-search
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: false
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 30
+    http_timeout_seconds: 20
+    search_freshness: oneWeek
+    search_count: 12
+    search_queries:
+      - site:zju.edu.cn 科技成果 转化
+      - site:zjut.edu.cn 科技成果 转化
+      - site:hdu.edu.cn 科技成果 转化
+      - site:zjgsu.edu.cn 科技成果 转化
+      - site:ucas.ac.cn 杭州高等研究院 科技成果 转化
+      - site:tmslab.cn 科技成果 转化
+      - site:ylab.ac.cn 科技成果 转化
+      - site:kjt.zj.gov.cn 科技成果 转化
+      - 浙江 高校 最新 科技成果 转化
+      - 浙江 实验室 最新 科技成果 转化
+
+  - key: zjgsu_kyc_home
+    name: 浙江工商大学科研动态入口
+    entry_urls:
+      - https://kyc.zjgsu.edu.cn/
+      - https://kyc.zjgsu.edu.cn/kydt/list8.htm
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+
+  - key: hias_kydt
+    name: 国科大杭州高等研究院科研动态入口
+    entry_urls:
+      - http://hias.ucas.ac.cn/kxyj/kydt.htm
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+    http_timeout_seconds: 15
+
+  - key: tmslab_kycg
+    name: 天目山实验室成果页
+    entry_urls:
+      - https://tmslab.cn/kxyj/kycg.htm
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+
+  - key: ylab_research
+    name: 甬江实验室新闻入口
+    entry_urls:
+      - https://www.ylab.ac.cn/news/yj_news/Index.html
+    mode: html
+    bootstrap_depth: full
+    weekly_depth: first_page
+    allowed_attachments: [pdf, docx]
+    enable_ai_link_classifier: true
+    enable_ai_content_judge: true
+    stop_when_older_than_days: 730
+    http_timeout_seconds: 20

@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+
+.env
+.venv/
+venv/
+
+*.tar.gz
+*.log
+
+.DS_Store
+Thumbs.db
