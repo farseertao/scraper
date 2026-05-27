@@ -1,7 +1,8 @@
 import unittest
+from datetime import datetime, timezone
 from unittest.mock import patch
 
-from zj_agent.crawler.fetcher import fetch_document
+from zj_agent.crawler.fetcher import fetch_document, normalize_datetime
 from zj_agent.crawler.source_registry import SourceConfig
 
 
@@ -50,6 +51,27 @@ class FetcherTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             fetch_document("https://example.com/manage/login.html", self.source, timeout_seconds=10)
+
+    def test_normalize_datetime_strips_timezone(self) -> None:
+        aware = datetime(2026, 5, 20, 12, 0, tzinfo=timezone.utc)
+        normalized = normalize_datetime(aware)
+        self.assertIsNone(normalized.tzinfo)
+        self.assertEqual(normalized, aware.astimezone().replace(tzinfo=None))
+
+    @patch("zj_agent.crawler.fetcher.dateparser.parse")
+    def test_extract_published_at_returns_naive_datetime(self, mock_parse) -> None:
+        from zj_agent.crawler.fetcher import _extract_published_at
+
+        mock_parse.return_value = datetime(2026, 5, 20, 12, 0, tzinfo=timezone.utc)
+        published_at = _extract_published_at(
+            __import__("bs4").BeautifulSoup(
+                "<html><meta property='article:published_time' content='2026-05-20T12:00:00+00:00'></html>",
+                "lxml",
+            )
+        )
+        self.assertIsNotNone(published_at)
+        assert published_at is not None
+        self.assertIsNone(published_at.tzinfo)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run zj-agent daily job every morning
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 Asia/Shanghai
+Persistent=true
+Unit=zj-agent-daily.service
+
+[Install]
+WantedBy=timers.target

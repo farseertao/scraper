@@ -60,6 +60,14 @@ def _decode_html(response: requests.Response) -> str:
     return response.text
 
 
+def normalize_datetime(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is not None:
+        return value.astimezone().replace(tzinfo=None)
+    return value
+
+
 def _extract_published_at(soup: BeautifulSoup) -> datetime | None:
     candidates: list[str] = []
     for selector in [
@@ -84,7 +92,9 @@ def _extract_published_at(soup: BeautifulSoup) -> datetime | None:
         candidates.append(match.group(1))
     for dt_str in candidates:
         try:
-            return dateparser.parse(dt_str, fuzzy=True)
+            parsed = dateparser.parse(dt_str, fuzzy=True)
+            if parsed is not None:
+                return normalize_datetime(parsed)
         except Exception:
             continue
     return None

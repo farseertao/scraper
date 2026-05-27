@@ -28,6 +28,8 @@ class FilterTests(unittest.TestCase):
     def test_login_page_detection(self) -> None:
         self.assertTrue(is_login_page("统一身份认证", "请输入账号密码后访问系统"))
         self.assertFalse(is_login_page("重大科技成果发布", "介绍核心技术、应用场景和转化方向"))
+        sidebar = "后台管理 " + ("浙江工商大学科研动态介绍项目转化进展。" * 20)
+        self.assertFalse(is_login_page("科研成果转化签约", sidebar))
 
     def test_rule_keep(self) -> None:
         decision = evaluate_retention(

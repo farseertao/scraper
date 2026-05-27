@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Iterable
@@ -9,7 +10,7 @@ from .ai import AiLinkClassifier, ContentJudge, LlmClient
 from .config import Settings
 from .crawler.deduper import compute_content_hash, is_near_duplicate
 from .crawler.discovery import discover_links
-from .crawler.fetcher import fetch_document
+from .crawler.fetcher import fetch_document, normalize_datetime
 from .crawler.filters import (
     evaluate_retention,
     evaluate_search_source_retention,
@@ -153,13 +154,17 @@ def _discover_search_links(
         api_key=settings.bocha_api_key,
         endpoint=settings.bocha_search_endpoint,
         timeout_seconds=max(10, _source_timeout(source, settings)),
+        max_retries=settings.bocha_max_retries,
+        retry_backoff_seconds=settings.bocha_retry_backoff_seconds,
     )
     if not client.enabled or not source.search_queries:
         return []
     freshness = source.search_freshness or ("oneWeek" if weekly_mode else "oneMonth")
     max_per_query = max(1, int(source.search_count or settings.max_links_per_source))
     discovered: list[DiscoveredLink] = []
-    for query in source.search_queries:
+    for index, query in enumerate(source.search_queries):
+        if index > 0 and settings.bocha_request_delay_seconds > 0:
+            time.sleep(settings.bocha_request_delay_seconds)
         try:
             results = client.search(
                 query=query,
@@ -292,13 +297,14 @@ def crawl_source(
                 )
                 stats.failed_docs += 1
                 continue
-            if document.published_at and document.published_at < oldest_allowed:
+            published_at = normalize_datetime(document.published_at)
+            if published_at and published_at < oldest_allowed:
                 update_candidate_status(
                     engine,
                     candidate_id,
                     status="dropped",
                     title=document.title,
-                    published_at=document.published_at,
+                    published_at=published_at,
                     decision_reason="older than configured lookback window",
                     reason_tags=["older_than_window"],
                 )

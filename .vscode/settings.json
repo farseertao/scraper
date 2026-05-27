@@ -1,0 +1,8 @@
+{
+  "python.defaultInterpreterPath": "C:\\Users\\ThinkBook\\.conda\\envs\\scraper\\python.exe",
+  "python.condaPath": "D:\\ProgramData\\anaconda3\\Scripts\\conda.exe",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "${workspaceFolder}/src"
+  }
+}

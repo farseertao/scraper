@@ -36,11 +36,15 @@ class Settings:
     app_secret_key: str = ""
     app_log_dir: str = ""
     weekly_notify_limit: int = 10
+    notify_resend: bool = False
     extract_batch_size: int = 50
     pool_batch_size: int = 50
     admin_session_hours: int = 12
     bocha_api_key: str = ""
     bocha_search_endpoint: str = "https://api.bochaai.com/v1/web-search"
+    bocha_request_delay_seconds: float = 2.0
+    bocha_max_retries: int = 4
+    bocha_retry_backoff_seconds: float = 2.0
 
 
 def load_settings() -> Settings:
@@ -104,6 +108,7 @@ def load_settings() -> Settings:
         app_secret_key=os.getenv("APP_SECRET_KEY", "").strip(),
         app_log_dir=os.getenv("APP_LOG_DIR", "").strip(),
         weekly_notify_limit=int(os.getenv("WEEKLY_NOTIFY_LIMIT", "10")),
+        notify_resend=os.getenv("NOTIFY_RESEND", "").strip().lower() in {"1", "true", "yes", "on"},
         extract_batch_size=int(os.getenv("EXTRACT_BATCH_SIZE", "50")),
         pool_batch_size=int(os.getenv("POOL_BATCH_SIZE", "50")),
         admin_session_hours=int(os.getenv("ADMIN_SESSION_HOURS", "12")),
@@ -111,4 +116,7 @@ def load_settings() -> Settings:
         bocha_search_endpoint=os.getenv(
             "BOCHA_SEARCH_ENDPOINT", "https://api.bochaai.com/v1/web-search"
         ).strip(),
+        bocha_request_delay_seconds=float(os.getenv("BOCHA_REQUEST_DELAY_SECONDS", "2")),
+        bocha_max_retries=int(os.getenv("BOCHA_MAX_RETRIES", "4")),
+        bocha_retry_backoff_seconds=float(os.getenv("BOCHA_RETRY_BACKOFF_SECONDS", "2")),
     )

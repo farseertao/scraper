@@ -232,14 +232,26 @@ def select_rows_for_notification(rows: list[dict], *, limit: int) -> list[dict]:
     return _sort_rows(selected)[:limit]
 
 
+def _summary_title(*, daily: bool = False) -> str:
+    return "今日科技成果线索汇总" if daily else "本周科技成果线索汇总"
+
+
+def _summary_note(*, daily: bool = False) -> str:
+    if daily:
+        return "说明：每日汇总推送，近 7 天线索优先，可重复发送已有线索。"
+    return "说明：优先推送近 7 天线索，最晚不超过 30 天，并混合官网来源与搜索补充来源。"
+
+
 def build_weekly_summary_message(
     rows: list[dict],
     *,
     source_key: str | None = None,
+    daily: bool = False,
 ) -> str:
     if not rows:
         scope = source_key or "全部来源"
-        return f"本周成果线索汇总：{scope} 暂无符合条件的新线索。"
+        period = "今日" if daily else "本周"
+        return f"{period}成果线索汇总：{scope} 暂无符合条件的新线索。"
 
     source_counter = Counter(str(row["source_name"] or "未知来源") for row in rows)
     source_distribution = "、".join(
@@ -247,11 +259,11 @@ def build_weekly_summary_message(
     )
 
     lines = [
-        "本周科技成果线索汇总",
+        _summary_title(daily=daily),
         f"范围：{source_key or '全部来源'}",
         f"条数：{len(rows)}",
         f"单位分布：{source_distribution}",
-        "说明：优先推送近 7 天线索，最晚不超过 30 天，并混合官网来源与搜索补充来源。",
+        _summary_note(daily=daily),
         "",
     ]
     for index, row in enumerate(rows, start=1):
@@ -274,18 +286,19 @@ def build_weekly_summary_post(
     rows: list[dict],
     *,
     source_key: str | None = None,
+    daily: bool = False,
 ) -> tuple[str, list[list[dict]]]:
     source_counter = Counter(str(row["source_name"] or "未知来源") for row in rows)
     source_distribution = "、".join(
         f"{name}{count}条" for name, count in source_counter.most_common()
     )
-    title = "本周科技成果线索汇总"
+    title = _summary_title(daily=daily)
     subtitle_scope = source_key or "全部来源"
     lines: list[list[dict]] = [
         [{"tag": "text", "text": f"范围：{subtitle_scope}"}],
         [{"tag": "text", "text": f"条数：{len(rows)}"}],
         [{"tag": "text", "text": f"单位分布：{source_distribution}"}],
-        [{"tag": "text", "text": "说明：优先推送近 7 天线索，最晚不超过 30 天，并混合官网来源与搜索补充来源。"}],
+        [{"tag": "text", "text": _summary_note(daily=daily)}],
     ]
     for index, row in enumerate(rows, start=1):
         lines.extend(
@@ -329,7 +342,7 @@ def notify_clue_pool(
     if not selected_rows:
         return stats.to_dict()
 
-    title, lines = build_weekly_summary_post(selected_rows, source_key=source_key)
+    title, lines = build_weekly_summary_post(selected_rows, source_key=source_key, daily=resend)
     notifier.send_post(title=title, lines=lines)
     stats.sent_docs = len(selected_rows)
     stats.sent_messages = 1

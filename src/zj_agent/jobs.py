@@ -155,6 +155,7 @@ def run_weekly_job(
         settings,
         source_key=source_key,
         limit=settings.weekly_notify_limit,
+        resend=settings.notify_resend,
     )
     return summary.to_dict()
 

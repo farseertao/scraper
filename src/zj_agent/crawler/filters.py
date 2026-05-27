@@ -18,6 +18,13 @@ LOGIN_TITLE_HINTS = [
     "管理员登录",
 ]
 
+STRONG_LOGIN_BODY_HINTS = [
+    "请输入用户名",
+    "请输入密码",
+    "请输入账号",
+    "忘记密码",
+]
+
 TITLE_NOISE_HINTS = [
     "通知",
     "预告",
@@ -179,10 +186,19 @@ def is_blocked_url(url: str) -> bool:
 
 
 def is_login_page(title: str, content: str) -> bool:
-    text = normalize_whitespace(f"{title}\n{content[:500]}")
-    if not text:
+    title_text = normalize_whitespace(title)
+    if title_text and any(hint in title_text for hint in LOGIN_TITLE_HINTS):
+        return True
+    body = normalize_whitespace(content[:1200])
+    if not body:
         return False
-    return any(hint in text for hint in LOGIN_TITLE_HINTS)
+    strong_hits = sum(1 for hint in STRONG_LOGIN_BODY_HINTS if hint in body)
+    if strong_hits >= 2:
+        return True
+    if len(body) >= 800:
+        return False
+    weak_hits = sum(1 for hint in LOGIN_TITLE_HINTS if hint in body)
+    return bool(weak_hits) and len(body) < 300
 
 
 def is_noise_title(title: str) -> bool:

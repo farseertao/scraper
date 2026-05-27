@@ -239,6 +239,39 @@ class NotificationsTests(unittest.TestCase):
         )
         mock_mark.assert_called_once_with(None, [1, 3])
 
+    @patch("zj_agent.notifications.mark_clue_pool_pushed")
+    @patch("zj_agent.notifications.fetch_clue_pool")
+    @patch("zj_agent.notifications.FeishuNotifier.send_post")
+    def test_notify_clue_pool_resend_allows_repeat(self, mock_send, mock_fetch, mock_mark) -> None:
+        now = datetime.now()
+        mock_fetch.return_value = [
+            {
+                "id": 1,
+                "source_key": "zju_itt",
+                "source_name": "浙江大学",
+                "title": "测试线索",
+                "page_url": "https://example.com/detail.htm",
+                "clue_type": "transfer",
+                "investment_relevance": "high",
+                "relevance_score": 88,
+                "core_technology": "测试技术",
+                "summary": "测试摘要",
+                "published_at": now - timedelta(days=1),
+            }
+        ]
+        stats = notify_clue_pool(
+            engine=None,
+            settings=self.settings,
+            source_key=None,
+            limit=1,
+            resend=True,
+        )
+        self.assertEqual(1, stats["sent_docs"])
+        mock_fetch.assert_called_once()
+        self.assertFalse(mock_fetch.call_args.kwargs["only_unpushed"])
+        mock_mark.assert_not_called()
+        self.assertEqual("今日科技成果线索汇总", mock_send.call_args.kwargs["title"])
+
 
 if __name__ == "__main__":
     unittest.main()
